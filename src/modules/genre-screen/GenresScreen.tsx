@@ -1,12 +1,21 @@
 import React from 'react';
-import { FlatList, Image, Text, View, StyleSheet, Pressable } from 'react-native';
+import {
+  FlatList,
+  Image,
+  Text,
+  View,
+  StyleSheet,
+  Pressable,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, typography } from '../../utils';
 import styles from './GenresScreenStyles';
 import { genres, colors } from '../../constants';
 import { ArrowRight } from 'lucide-react-native';
+import useGenreScreen from './useGenreScreen';
 
 const GenresScreen = () => {
+  const { handleGenrePress } = useGenreScreen();
   return (
     <SafeAreaView style={styles.container}>
       <Image
@@ -29,7 +38,7 @@ const GenresScreen = () => {
         renderItem={({ item }) => {
           let Icon = item.icon;
           return (
-            <Pressable style={styles.listContainer}>
+            <Pressable style={styles.listContainer} onPress={() => handleGenrePress(item.name)}>
               <View style={styles.rowCenter}>
                 <Icon
                   size={moderateScale(26)}

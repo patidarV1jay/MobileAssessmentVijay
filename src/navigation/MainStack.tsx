@@ -1,5 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { GenresScreen } from '../modules';
+import { GenresScreen, BooksScreen } from '../modules';
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -12,6 +14,7 @@ const MainStack = () => {
       }}
     >
       <Stack.Screen name="Genres" component={GenresScreen} />
+      <Stack.Screen name="Books" component={BooksScreen} />
     </Stack.Navigator>
   );
 };
