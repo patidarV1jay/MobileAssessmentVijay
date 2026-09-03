@@ -1,97 +1,486 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Gutenberg Project
 
-# Getting Started
+A React Native mobile application for browsing and reading public-domain books from the Gutenberg/Gutendex API.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+The app allows users to select a book genre, browse books with cover images, search within the selected genre, load additional results using API pagination, and open a selected book in an external browser using the best available supported format.
 
-## Step 1: Start Metro
+## Project Overview
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+The application contains two main screens:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### 1. Genres Screen
 
-```sh
-# Using npm
-npm start
+The first screen displays the available book genres:
 
-# OR using Yarn
-yarn start
+- Fiction
+- Drama
+- Humor
+- Politics
+- Philosophy
+- History
+- Adventure
+
+Selecting a genre navigates the user to the Books screen and passes the selected genre as a navigation parameter.
+
+### 2. Books Screen
+
+The Books screen:
+
+- Displays books for the selected genre.
+- Shows only books that have cover images.
+- Displays book cover, title, and author.
+- Supports API-based search.
+- Supports infinite scrolling using the API's `next` pagination link.
+- Works in both portrait and landscape orientations.
+- Opens books in an external browser.
+
+When a book is tapped, the application selects the first available viewable format in this order:
+
+1. HTML
+2. PDF
+3. TXT
+
+ZIP files are ignored because they are not directly viewable in a browser.
+
+If none of the supported viewable formats are available, an alert is shown to the user.
+
+---
+
+## API
+
+The application uses the Gutenberg/Gutendex API:
+
+```text
+https://gutendex.careers.ignitesol.com
 ```
 
-## Step 2: Build and run your app
+Books are requested using API filters rather than filtering the downloaded list locally.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+Example:
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```text
+/books?topic=Fiction&mime_type=image/jpeg&search=Vampire
 ```
 
-### iOS
+This means the returned books must:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+- Match `Fiction` in Subjects or Bookshelves.
+- Match `Vampire` in Title or Author when a search term is entered.
+- Have an `image/jpeg` format so only books with covers are returned.
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+---
 
-```sh
-bundle install
+## Setup and Run Instructions
+
+### Prerequisites
+
+Make sure the following are installed:
+
+- Node.js
+- npm
+- React Native development environment
+- Android Studio for Android development
+- Xcode for iOS development on macOS
+
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd MobileAssessmentVijay
 ```
 
-Then, and every time you update your native dependencies, run:
+### 2. Install dependencies
 
-```sh
-bundle exec pod install
+```bash
+npm install
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### 3. Install iOS pods
 
-```sh
-# Using npm
-npm run ios
+For iOS only:
 
-# OR using Yarn
-yarn ios
+```bash
+cd ios
+pod install
+cd ..
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### 4 . Run on Android
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+Open another terminal and run:
 
-## Step 3: Modify your app
+```bash
+npx react-native run-android
+```
 
-Now that you have successfully run the app, let's make changes!
+### 5. Run on iOS
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+On macOS:
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+```bash
+npx react-native run-ios
+```
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+If Metro cache causes unexpected build issues, restart it using:
 
-## Congratulations! :tada:
+```bash
+npx react-native start --reset-cache
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+---
 
-### Now what?
+## Architecture Overview
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+The project follows a simple modular React Native structure.
 
-# Troubleshooting
+```text
+src/
+├── assets/
+│   └── images/ and font/
+├── constants/
+│   └── genre and color constants
+├── config/
+│   └── booksApi and client
+├── modules/
+│   ├── genres-screen/
+│   │   ├── GenresScreen.tsx
+│   │   └── GenresScreenStyles.ts
+│   └── books-screen/
+│       ├── BooksScreen.tsx
+│       ├── BooksScreenStyles.tsx
+│       └── useBookScreen.ts
+├── navigation/
+│   ├── AppNavigator.tsx
+│   └── navigationTypes.ts
+├── services/
+│   ├── apiClient.ts
+│   └── booksApi.ts
+├── types/
+│   └── bookTypes.ts
+└── utils/
+    └── responsive scaling utilities
+```
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+### Responsibilities
 
-# Learn More
+**GenresScreen**
 
-To learn more about React Native, take a look at the following resources:
+- Displays all available genres.
+- Navigates to the Books screen with the selected genre.
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**BooksScreen**
+
+- Displays the books grid.
+- Handles portrait and landscape layouts.
+- Displays loading, error, empty, and pagination states.
+- Handles book selection.
+
+**useBookScreen**
+
+- Contains book-opening logic.
+- Selects HTML, PDF, or TXT in priority order.
+- Ignores ZIP files.
+- Opens the selected URL using React Native Linking.
+
+**booksApi**
+
+- Contains book-related API calls.
+- Applies genre, search, and image MIME-type filters.
+- Handles pagination requests.
+
+**apiClient**
+
+- Central Axios instance.
+- Defines API base URL, timeout, and common headers.
+- Handles common API/network error logging.
+
+**navigation**
+
+- Contains React Navigation configuration.
+- Defines typed route parameters.
+
+---
+
+## Responsive Design
+
+The Books screen supports both portrait and landscape orientations.
+
+The application uses:
+
+```tsx
+useWindowDimensions()
+```
+
+to react to orientation and window-size changes.
+
+It also uses:
+
+```tsx
+useSafeAreaInsets()
+```
+
+to account for device notches, rounded corners, and landscape safe areas.
+
+The book grid adjusts its number of columns based on the available screen width/orientation.
+
+Typical layout:
+
+```text
+Portrait  -> 3 columns
+Landscape -> 6 columns
+```
+
+---
+
+## Book Format Selection
+
+The API can return several book formats.
+
+The application follows the required priority:
+
+```text
+HTML -> PDF -> TXT
+```
+
+The selected URL must also be directly viewable.
+
+URLs ending in `.zip` are skipped.
+
+Example logic:
+
+```text
+HTML available and not ZIP
+    -> Open HTML
+
+Otherwise PDF available and not ZIP
+    -> Open PDF
+
+Otherwise TXT available and not ZIP
+    -> Open TXT
+
+Otherwise
+    -> Show error alert
+```
+
+This prevents ZIP archives from being passed to the browser as viewable books.
+
+---
+
+## Search Behaviour
+
+Search is performed through the API.
+
+For example, if the selected genre is:
+
+```text
+Fiction
+```
+
+and the user searches:
+
+```text
+Vampire
+```
+
+the request includes both:
+
+```text
+topic=Fiction
+search=Vampire
+```
+
+Therefore the results match the selected genre and the search query together.
+
+Search is debounced before making the API request to avoid unnecessary API calls while the user is typing.
+
+---
+
+## Pagination
+
+The Books screen implements infinite scrolling using the `next` URL returned by the API.
+
+The API may return pagination links containing an internal backend hostname, for example:
+
+```text
+http://gutendex-api:8974/books/?page=2...
+```
+
+The application removes the internal protocol/hostname and reuses the configured Axios `baseURL`.
+
+Example:
+
+```text
+http://gutendex-api:8974/books/?page=2
+```
+
+becomes:
+
+```text
+/books/?page=2
+```
+
+and Axios sends the request through:
+
+```text
+https://gutendex.careers.ignitesol.com
+```
+
+Duplicate books are prevented when appending paginated results.
+
+---
+
+## Third-Party Libraries Used
+
+### React Navigation
+
+Used for navigation between the Genres and Books screens.
+
+Packages:
+
+```text
+@react-navigation/native
+@react-navigation/native-stack
+```
+
+### Axios
+
+Used for all API requests.
+
+Package:
+
+```text
+axios
+```
+
+A reusable Axios client is configured with:
+
+- Base URL
+- Request timeout
+- Common headers
+- Response error interceptor
+
+### Lucide React Native
+
+Used for icons such as genre icons, back arrow, search icon, and navigation arrow.
+
+Package:
+
+```text
+lucide-react-native
+```
+
+### React Native Safe Area Context
+
+Used for safe-area handling on devices with notches, rounded corners, and landscape insets.
+
+Package:
+
+```text
+react-native-safe-area-context
+```
+
+---
+
+## AI Tools Used
+
+ChatGPT was used as a development assistant during implementation.
+
+It was used for:
+
+- Reviewing the assessment requirements.
+- Discussing React Native architecture.
+- API integration guidance.
+- React Navigation setup.
+- Pagination handling.
+- Responsive portrait/landscape layout guidance.
+- Debugging React Native and Axios issues.
+- Book format-selection logic.
+- README documentation assistance.
+
+All generated suggestions were reviewed and integrated into the project during development.
+
+---
+
+## Assumptions and Known Limitations
+
+### Assumptions
+
+- The Gutendex assessment API remains available.
+- Each returned book has an `image/jpeg` format because API requests use the `mime_type=image/jpeg` filter.
+- A device has an installed browser capable of opening standard HTTPS URLs.
+- Genre filtering is performed by the Gutendex `topic` parameter.
+- Search filtering is performed by the Gutendex `search` parameter.
+
+### Known Limitations
+
+- The application requires an internet connection.
+- No offline caching is implemented.
+- Search and pagination depend on the availability and response time of the Gutendex API.
+- Books are opened externally rather than rendered inside the application.
+- Only HTML, PDF, and TXT are considered viewable formats as required by the assessment.
+- EPUB, MOBI, ZIP, RDF, and other formats are intentionally ignored.
+- A book with no directly viewable HTML, PDF, or TXT URL displays an error alert.
+- Landscape layout may vary slightly depending on device safe areas and screen dimensions.
+
+---
+
+## Demo Video
+
+The demo video should show the complete user flow in both required orientations.
+
+### Portrait Demo
+
+Include:
+
+- Genres screen
+- Selecting a genre
+- Books list
+- Search
+- Scrolling/pagination
+- Opening a book in the browser
+
+Demo video:
+
+```text
+https://www.loom.com/share/294c9a99f3444a1e85a1967383bd4682
+```
+
+### Landscape Demo
+
+Include:
+
+- Rotating the application to landscape
+- Responsive books grid
+- Search
+- Scrolling
+- Opening a book
+
+Demo video:
+
+```text
+https://www.loom.com/share/2bf2f60a69404b8da8eab8d2479b5a96
+```
+
+If both orientations are demonstrated in a single video, use:
+
+```text
+Add combined portrait + landscape demo video link here
+```
+
+---
+
+## Summary
+
+The application implements the core Gutenberg assessment requirements:
+
+- Genre-based navigation
+- API-based genre filtering
+- Cover-image-only results
+- API-based search
+- Infinite scrolling
+- Duplicate-result protection
+- Portrait and landscape support
+- HTML -> PDF -> TXT format priority
+- ZIP-file exclusion
+- External browser book opening
+- Loading, error, and empty states
